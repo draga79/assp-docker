@@ -1,5 +1,5 @@
 #Creating Images for ASSP web service 
-FROM alpine:3.5
+FROM alpine:3.7
 
 RUN { \
        echo '@edge http://nl.alpinelinux.org/alpine/edge/main'; \
@@ -41,17 +41,21 @@ RUN true & \
     wget https://sourceforge.net/projects/assp/files/latest/download?source=files -O ASSP.zip && \
     unzip ASSP.zip && \
     cd assp && \
-    wget http://assp.cvs.sourceforge.net/viewvc/assp/assp2/filecommander/?view=tar -O assp-filecommander.tar.gz && \
-    tar xzvf assp-filecommander.tar.gz && \
+    #wget http://assp.cvs.sourceforge.net/viewvc/assp/assp2/filecommander/?view=tar -O assp-filecommander.tar.gz && \
+    #tar xzvf assp-filecommander.tar.gz && \
+    mkdir filecommander && \
+    wget "https://sourceforge.net/projects/assp/files/ASSP%20V2%20multithreading/filecommander/1.05.ZIP/download" -O 1.05.ZIP && mv 1.05.ZIP filecommander && \
     unzip filecommander/1.05.ZIP && \
     mv 1.05/images/* /usr/share/assp/images && \
-    mv 1.05/lib/* /usr/share/assp/lib && \
-    wget  http://assp.cvs.sourceforge.net/viewvc/assp/assp2/lib/?view=tar -O assp-lib.tar.gz && \
-    tar xzvf assp-lib.tar.gz
+    mv 1.05/lib/* /usr/share/assp/lib 
+    #wget  http://assp.cvs.sourceforge.net/viewvc/assp/assp2/lib/?view=tar -O assp-lib.tar.gz && \
+    #wget  https://sourceforge.net/projects/assp/files/ASSP%20V2%20multithreading/lib/lib.zip/download -O assp-lib.zip && \
+    #tar xzvf assp-lib.tar.gz
+    #unzip assp-lib.zip
 
 # Configure DKIM
-RUN cp /etc/opendkim/opendkim.conf.sample /etc/opendkim/opendkim.conf && \
-    { \
+#RUN cp /etc/opendkim/opendkim.conf.sample /etc/opendkim/opendkim.conf && \
+RUN    { \
       echo 'Canonicalization        relaxed/simple'; \
       echo 'ExternalIgnoreList      refile:/etc/opendkim/TrustedHosts'; \
       echo 'InternalHosts           refile:/etc/opendkim/TrustedHosts'; \
@@ -72,7 +76,7 @@ RUN { \
 	echo 'autostart       = true'; \
 	echo 'autorestart     = false'; \
 	echo 'directory       = /etc/postfix'; \
-	echo 'command         = /usr/sbin/postfix.sh'; \
+	echo 'command         = /postfix.sh'; \
 	echo 'startsecs       = 0'; \
 	echo; \
 	echo '[program:opendkim]'; \

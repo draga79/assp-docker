@@ -1,5 +1,5 @@
 #Creating Images for ASSP web service 
-FROM alpine:3.7
+FROM alpine:3.8
 
 RUN { \
        echo '@edge http://nl.alpinelinux.org/alpine/edge/main'; \

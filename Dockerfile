@@ -10,8 +10,7 @@ RUN { \
 ENV TZ=Europe/Amsterdam
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-RUN apk update && apk upgrade
-RUN true && \
+RUN true && apk update && apk upgrade && \
 	apk add --update tzdata postfix bash supervisor perl perl-sys-hostname-long perl-net-dns make automake gcc \
 	perl-lwp-protocol-https perl-dbd-pg perl-dbd-mysql perl-dbd-sqlite perl-cgi-psgi perl-cgi perl-fcgi perl-term-readkey \ 
 	perl-xml-rss perl-crypt-ssleay perl-crypt-eksblowfish perl-crypt-x509 perl-html-mason-psgihandler perl-fcgi-procmanager \ 
@@ -28,12 +27,9 @@ RUN true && \
 # Install CPAN modules
 RUN cpan CPAN Log::Log4perl
 # RUN cpan -T Authen::SASL
-RUN cpan BerkeleyDB BerkeleyDB_DBEngine Convert::TNEF DB_File Email::MIME Email::Send File::ReadBackwards MIME::Types Mail::DKIM::Verifier
-RUN cpan -T Mail::SPF Mail::SPF::Query Schedule::Cron Filesys::DiskSpace Sys::CpuAffinity
-RUN cpan Mail::SRS Net::CIDR::Lite Net::IP Net::LDAP NetAddr::IP::Lite Regexp::Optimizer Sys::MemInfo Text::Unidecode Thread::State Tie::RDBM \
+RUN cpan BerkeleyDB BerkeleyDB_DBEngine Convert::TNEF DB_File Email::MIME Email::Send File::ReadBackwards MIME::Types Mail::DKIM::Verifier && cpan -T Mail::SPF Mail::SPF::Query Schedule::Cron Filesys::DiskSpace Sys::CpuAffinity && cpan Mail::SRS Net::CIDR::Lite Net::IP Net::LDAP NetAddr::IP::Lite Regexp::Optimizer Sys::MemInfo Text::Unidecode Thread::State Tie::RDBM \
          Unicode::GCString Convert::Scalar Lingua::Stem::Snowball Lingua::Identify IO::Socket::SSL Archive::Extract Archive::Zip \
-         IO::Socket::INET6 Filesys::Df
-RUN rm -rf /root/.cpan/* 2>/dev/null
+         IO::Socket::INET6 Filesys::Df && rm -rf /root/.cpan/* 2>/dev/null
 
 # Get ASSP
 RUN true & \
@@ -105,15 +101,7 @@ RUN { \
 	} | tee /etc/supervisord.conf
 
 # Configure postfix
-RUN postconf -e smtputf8_enable=no
-RUN postalias /etc/postfix/aliases
-RUN postconf -e mydestination=
-RUN postconf -e relay_domains=
-RUN postconf -e smtpd_delay_reject=yes
-RUN postconf -e smtpd_helo_required=yes
-RUN postconf -e "smtpd_helo_restrictions=permit_mynetworks,reject_invalid_helo_hostname,permit"
-RUN postconf -e "mynetworks=127.0.0.0/8,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
-RUN sed -i -r -e 's/^#submission/submission/' -e 's/smtp      inet  n       -       n       -       -       smtpd/125      inet  n       -       n       -       -       smtpd/' /etc/postfix/master.cf
+RUN postconf -e smtputf8_enable=no && postalias /etc/postfix/aliases && postconf -e mydestination= && postconf -e relay_domains= && postconf -e smtpd_delay_reject=yes && postconf -e smtpd_helo_required=yes && postconf -e "smtpd_helo_restrictions=permit_mynetworks,reject_invalid_helo_hostname,permit" && postconf -e "mynetworks=127.0.0.0/8,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16" && sed -i -r -e 's/^#submission/submission/' -e 's/smtp      inet  n       -       n       -       -       smtpd/125      inet  n       -       n       -       -       smtpd/' /etc/postfix/master.cf
 
 # Create postfix.sh
 RUN { \
@@ -125,9 +113,8 @@ RUN { \
     echo '/usr/sbin/postfix -c /etc/postfix start'; \
 } | tee /postfix.sh
 
-RUN chmod +x /postfix.sh
-RUN chmod +x /usr/share/assp/assp.pl
-RUN mkdir -p /etc/assp && ln -s /etc/assp/assp.cfg /usr/share/assp/assp.cfg
+#RUN chmod +x /postfix.sh && chmod +x /usr/share/assp/assp.pl && mkdir -p /etc/assp && touch /etc/assp/assp.cfg && ln -s /etc/assp/assp.cfg /usr/share/assp/assp.cfg
+RUN chmod +x /postfix.sh && chmod +x /usr/share/assp/assp.pl 
 
 #Exposing tcp ports
 EXPOSE 55555
@@ -135,13 +122,13 @@ EXPOSE 225
 EXPOSE 25
 
 #Adding volumes
-VOLUME ["/etc/postfix", \
-        "/usr/share/assp/assp.cfg", \
-		"/usr/share/assp/errors", \
-		"/usr/share/assp/spam", \
-		"/usr/share/assp/notspam", \
-		"/usr/share/assp/certs", \
-		"/etc/opendkim"]
+#VOLUME ["/etc/postfix", \
+#        "/usr/share/assp/assp.cfg", \
+#		"/usr/share/assp/errors", \
+#		"/usr/share/assp/spam", \
+#		"/usr/share/assp/notspam", \
+#		"/usr/share/assp/certs", \
+#		"/etc/opendkim"]
 
 # Running final script
 ENTRYPOINT ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]

@@ -60,6 +60,7 @@ RUN    { \
     } | tee >> /etc/opendkim/opendkim.conf && \
     sed -i -r -e 's/inet:port@localhost/inet:12301@localhost/' /etc/opendkim/opendkim.conf
 
+#	echo 'command         = /postfix.sh'; \
 # Configure supervisord
 RUN { \
 	echo '[supervisord]'; \
@@ -69,10 +70,10 @@ RUN { \
 	echo; \
 	echo '[program:postfix]'; \
 	echo 'process_name    = postfix'; \
+	echo 'command         = /usr/sbin/postfix -c /etc/postfix start'; \
 	echo 'autostart       = true'; \
 	echo 'autorestart     = false'; \
 	echo 'directory       = /etc/postfix'; \
-	echo 'command         = /postfix.sh'; \
 	echo 'startsecs       = 0'; \
 	echo; \
 	echo '[program:opendkim]'; \

@@ -7,7 +7,7 @@ RUN { \
     } | tee >> /etc/apk/repositories
 
 
-ENV TZ=Europe/Amsterdam
+ENV TZ=Europe/Rome
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 RUN true && apk update && apk upgrade && \

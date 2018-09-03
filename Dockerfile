@@ -102,7 +102,7 @@ RUN { \
 	} | tee /etc/supervisord.conf
 
 # Configure postfix
-RUN postconf -e smtputf8_enable=no && postalias /etc/postfix/aliases && postconf -e mydestination= && postconf -e relay_domains= && postconf -e smtpd_delay_reject=yes && postconf -e smtpd_helo_required=yes && postconf -e "smtpd_helo_restrictions=permit_mynetworks,reject_invalid_helo_hostname,permit" && postconf -e "mynetworks=127.0.0.0/8,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16" && sed -i -r -e 's/^#submission/submission/' -e 's/smtp      inet  n       -       n       -       -       smtpd/125      inet  n       -       n       -       -       smtpd/' /etc/postfix/master.cf
+RUN postconf -e message_size_limit=20240000 && postconf -e smtputf8_enable=no && postalias /etc/postfix/aliases && postconf -e mydestination= && postconf -e relay_domains= && postconf -e smtpd_delay_reject=yes && postconf -e smtpd_helo_required=yes && postconf -e "smtpd_helo_restrictions=permit_mynetworks,reject_invalid_helo_hostname,permit" && postconf -e "mynetworks=127.0.0.0/8,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16" && sed -i -r -e 's/^#submission/submission/' -e 's/smtp      inet  n       -       n       -       -       smtpd/125      inet  n       -       n       -       -       smtpd/' /etc/postfix/master.cf
 
 # Create postfix.sh
 RUN { \

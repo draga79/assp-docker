@@ -1,5 +1,5 @@
 #Creating Images for ASSP web service 
-FROM alpine:3.8
+FROM alpine:3.12
 
 RUN { \
        echo '@edge http://nl.alpinelinux.org/alpine/edge/main'; \
@@ -11,7 +11,7 @@ ENV TZ=Europe/Rome
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 RUN true && apk update && apk upgrade && \
-	apk add --update tzdata postfix bash supervisor perl perl-sys-hostname-long perl-net-dns make automake gcc \
+	apk add --update unzip tzdata postfix bash supervisor perl perl-sys-hostname-long perl-net-dns make automake gcc \
 	perl-lwp-protocol-https perl-dbd-pg perl-dbd-mysql perl-dbd-sqlite perl-cgi-psgi perl-cgi perl-fcgi perl-term-readkey \ 
 	perl-xml-rss perl-crypt-ssleay perl-crypt-eksblowfish perl-crypt-x509 perl-html-mason-psgihandler perl-fcgi-procmanager \ 
 	perl-mime-types perl-list-moreutils perl-json perl-html-quoted perl-html-scrubber perl-email-address perl-text-password-pronounceable \
@@ -27,9 +27,9 @@ RUN true && apk update && apk upgrade && \
 # Install CPAN modules
 RUN cpan CPAN Log::Log4perl
 # RUN cpan -T Authen::SASL
-RUN cpan BerkeleyDB BerkeleyDB_DBEngine Convert::TNEF DB_File Email::MIME Email::Send File::ReadBackwards MIME::Types Mail::DKIM::Verifier && cpan -T Mail::SPF Mail::SPF::Query Schedule::Cron Filesys::DiskSpace Sys::CpuAffinity && cpan Mail::SRS Net::CIDR::Lite Net::IP Net::LDAP NetAddr::IP::Lite Regexp::Optimizer Sys::MemInfo Text::Unidecode Thread::State Tie::RDBM \
+RUN cpan BerkeleyDB BerkeleyDB_DBEngine Convert::TNEF DB_File Email::MIME Email::Send File::ReadBackwards MIME::Types Mail::DKIM::Verifier ; cpan -T Mail::SPF Mail::SPF::Query Schedule::Cron Filesys::DiskSpace Sys::CpuAffinity ; cpan Mail::SRS Net::CIDR::Lite Net::IP Net::LDAP NetAddr::IP::Lite Regexp::Optimizer Sys::MemInfo Text::Unidecode Thread::State Tie::RDBM \
          Unicode::GCString Convert::Scalar Lingua::Stem::Snowball Lingua::Identify IO::Socket::SSL Archive::Extract Archive::Zip \
-         IO::Socket::INET6 Filesys::Df && rm -rf /root/.cpan/* 2>/dev/null
+         IO::Socket::INET6 Filesys::Df ; rm -rf /root/.cpan/* 2>/dev/null
 
 # Get ASSP
 RUN true & \
